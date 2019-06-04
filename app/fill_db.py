@@ -35,7 +35,7 @@ def addStuff(x):
 def getMeta(x):
     return int(x.split(';')[2].split('=')[1])    
 
-@app.route('/filldb')
+@app.route('/filldb', methods=['GET', 'POST'])
 def readFile():
     convertFile()
     df = pd.read_csv("gnomad.exomes.r2.1.1.sites.Y.vcf",sep = '\\t', comment='##', header=0)
@@ -60,7 +60,7 @@ def readFile():
     
     return (mycursor.rowcount, "record inserted.")
 
-@app.route('/getresults')
+@app.route('/getresults', methods=['GET', 'POST'])
 def get_significant(lijstje):
     mydb = mysql.connector.connect(
       host="192.168.99.101",
@@ -86,7 +86,7 @@ def get_significant(lijstje):
     
     return myresult
 
-@app.route('/make_db')
+@app.route('/make_db', methods=['GET', 'POST'])
 def make_db(script):
     mydb = mysql.connector.connect(
       host="192.168.99.101",

@@ -23,30 +23,11 @@ CREATE TABLE IF NOT EXISTS `mydb`.`Position` (
   `Position` INT NOT NULL,
   `Chromosome` INT NOT NULL,
   `ID_position` INT NOT NULL,
-  PRIMARY KEY (`ID_position`))
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `mydb`.`Stats`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `mydb`.`Stats` ;
-
-CREATE TABLE IF NOT EXISTS `mydb`.`Stats` (
-  `ID_stats` INT NOT NULL,
   `REF` VARCHAR(50) NOT NULL,
   `ALT` VARCHAR(50) NOT NULL,
   `AF` INT NOT NULL,
-  `Position_ID_position` INT NOT NULL,
-  PRIMARY KEY (`ID_stats`, `Position_ID_position`),
-  INDEX `fk_Stats_Position_idx` (`Position_ID_position` ASC) VISIBLE,
-  CONSTRAINT `fk_Stats_Position`
-    FOREIGN KEY (`Position_ID_position`)
-    REFERENCES `mydb`.`Position` (`ID_position`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+  PRIMARY KEY (`ID_position`))
 ENGINE = InnoDB;
-
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

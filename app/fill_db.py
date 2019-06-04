@@ -70,7 +70,7 @@ def get_significant(lijstje):
       database="mydb"
     )
     mycursor = mydb.cursor()
-    #[(chr,pos, REF, ALT, AF)]
+    #[(chr,pos, REF, ALT)]
     stmt = """
     SELECT Position,
     Chromosome,

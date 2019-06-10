@@ -6,17 +6,9 @@ Created on Thu May  9 10:33:41 2019
 """
 import pandas as pd
 import mysql.connector
-from flask import Flask
+from flask import Flask, jsonify
 
 app = Flask(__name__)
-
-def convertFile():
-    file = open("gnomad.exomes.r2.1.1.sites.Y.vcf")
-    lines = ''.join(file.readlines())
-    file.close()
-    file= open("gnomad.exomes.r2.1.1.sites.Y.tsv", 'w+')
-    file.write(lines)
-    file.close
 
 def convertChrom(x):
     if x in ['y', 'Y']:
@@ -37,7 +29,6 @@ def getMeta(x):
 
 @app.route('/filldb', methods=['GET', 'POST'])
 def readFile():
-    convertFile()
     df = pd.read_csv("gnomad.exomes.r2.1.1.sites.Y.vcf",sep = '\\t', comment='##', header=0)
     df = df.loc[df['ID'] != '.']
     df['#CHROM'] = df['#CHROM'].apply(convertChrom)
@@ -60,8 +51,17 @@ def readFile():
     
     return (mycursor.rowcount, "record inserted.")
 
-@app.route('/getresults', methods=['GET', 'POST'])
-def get_significant(lijstje):
+def read_data(file):
+    datalist = []
+    with open('data/'+file) as f:
+        for line in f:
+            datalist.append(tuple(line.split(',')))
+    return datalist
+
+@app.route('/getresults',methods = ['POST', 'GET'])
+def get_significant(file):
+    lijstje = read_data(file)
+    
     mydb = mysql.connector.connect(
       host="192.168.99.101",
       port="3306",
@@ -70,7 +70,7 @@ def get_significant(lijstje):
       database="mydb"
     )
     mycursor = mydb.cursor()
-    #[(chr,pos, REF, ALT)]
+    #[(chr,pos, REF, ALT, AF)]
     stmt = """
     SELECT Position,
     Chromosome,
@@ -84,7 +84,13 @@ def get_significant(lijstje):
     mycursor.executemany(stmt, lijstje)  
     myresult = mycursor.fetchall()
     
-    return myresult
+    payload = []
+    for result in myresult:
+       content = {'pos': result[0], 'chr': result[1], 'ref': result[2], 'alt': result[3], 'af': result[4]}
+       payload.append(content)
+       content = {}
+    
+    return jsonify(payload)
 
 @app.route('/make_db', methods=['GET', 'POST'])
 def make_db(script):

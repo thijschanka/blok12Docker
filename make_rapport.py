@@ -6,6 +6,7 @@ Created on Tue Jun 11 12:48:17 2019
 """
 
 import pandas as pd
+import sys
 
 def readraport(bestand):
     df = pd.read_json(bestand)
@@ -29,19 +30,19 @@ def get_circle_cos(df):
 def get_lowest(df):
     cols = ['chr', 'pos', 'ref', 'alt', 'af']
     df = df[cols]
-    df = df.sort_values(by=['af'], ascending=False)
-    x = df.to_html(classes='w3-table-all', bold_rows=True, max_rows=5)
+    df = df.sort_values(by=['af'], ascending=False).head(5)
+    x = df.to_html(classes='w3-table-all', bold_rows=True)
     return str(x)
     
 def get_highest(df):
     cols = ['chr', 'pos', 'ref', 'alt', 'af']
     df = df[cols]
-    df = df.sort_values(by=['af'])
-    x = df.to_html(classes='w3-table-all', bold_rows=True, max_rows=5)
+    df = df.sort_values(by=['af']).head(5)
+    x = df.to_html(classes='w3-table-all', bold_rows=True)
     return str(x)
 
-def main(bestand):
-    df = readraport(bestand)
+def main(file_in, file_out):
+    df = readraport(file_in)
     rapport = '<HTML><BODY><link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">'
     rapport += """<script>
 window.onload = function() {
@@ -77,11 +78,9 @@ chart.render();
     rapport += '<br>all potential pathogenic mutations<br>'
     rapport += get_table(df)
     rapport += "<br></BODY></HTML>"
-    bestand = open('Rapport.HTML', 'w+')
+    bestand = open(file_out, 'w+')
     bestand.write(rapport)
-    bestand.close()
-    
-#    safe_rapport(rapport)
+
     
 
-main("teststats_output.json")
+main(snakemake.input[0], snakemake.output[0])

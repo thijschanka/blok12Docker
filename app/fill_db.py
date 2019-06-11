@@ -84,14 +84,18 @@ def get_significant():
     ALT,
     AF
     FROM Position
-    WHERE AF < 0.1"""
+    WHERE AF < 0.01"""
     if len(lijstje) != 0:
         stmt += 'AND Chromosome = %s AND Position = %s AND REF = %s AND ALT = %s'
+    else:
+        lijstje.append(-1)
     stmt += ' ;'
-    #mycursor.executemany(stmt, lijstje)
     payload = []
     for data in lijstje:
-        mycursor.execute(stmt, data)
+        if data == -1:
+            mycursor.execute(stmt)
+        else:
+            mycursor.execute(stmt, data)
         myresult = mycursor.fetchall()
     
         

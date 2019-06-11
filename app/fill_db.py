@@ -76,6 +76,7 @@ def get_significant():
     )
     mycursor = mydb.cursor()
     #[(chr,pos, REF, ALT, AF)]
+    
     stmt = """
     SELECT Position,
     Chromosome,
@@ -83,10 +84,10 @@ def get_significant():
     ALT,
     AF
     FROM Position
-    WHERE Chromosome = %s AND Position = %s AND
-    REF = %s AND ALT = %s
-    AND AF < 0.1
-    ;"""
+    WHERE AF < 0.1"""
+    if len(lijstje) != 0:
+        stmt += 'AND Chromosome = %s AND Position = %s AND REF = %s AND ALT = %s'
+    stmt += ' ;'
     #mycursor.executemany(stmt, lijstje)
     payload = []
     for data in lijstje:

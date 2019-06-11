@@ -6,7 +6,8 @@ Created on Thu May  9 10:33:41 2019
 """
 import pandas as pd
 import mysql.connector
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
+from os import listdir
 
 app = Flask(__name__)
 
@@ -20,53 +21,57 @@ def convertChrom(x):
 def convertID(x):
     x = x[2:]
     return int(x)
-
-def addStuff(x):
-    return int(str(x[0])+str(x[1]))
     
 def getMeta(x):
-    return int(x.split(';')[2].split('=')[1])    
+    return float(x.split(';')[2].split('=')[1])    
 
 @app.route('/filldb', methods=['GET', 'POST'])
 def readFile():
-    df = pd.read_csv("gnomad.exomes.r2.1.1.sites.Y.vcf",sep = '\\t', comment='##', header=0)
-    df = df.loc[df['ID'] != '.']
-    df['#CHROM'] = df['#CHROM'].apply(convertChrom)
-    df['ID'] = df['ID'].apply(convertID)
-    df['POSCHROM'] = df.apply(addStuff)
-    df['AF'] = df['INFO'].apply(getMeta)
-    dataset = list(df[['POS', '#CHROM', 'POSCHROM', 'ID', 'REF', 'ALT', 'POS', 'AF']].itertuples(index=False, name=None))
+    files = listdir("/data/insert/")
+    rowsinsert = 0
     mydb = mysql.connector.connect(
-      host="192.168.99.101",
-      port="3306",
-      user="user",
-      passwd="pass",
-      database="mydb"
+     host="db",
+     port="3306",
+     user="root",
+     passwd="root",
+     database="mydb"
     )
     mycursor = mydb.cursor()
-    
-    stmt = "INSERT INTO Position (position, Chromosome_ID, ID_position, REF, ALT, AF) VALUES (%s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE ID_position=ID_position;"
-    mycursor.executemany(stmt, dataset)  
-    mydb.commit()
-    
-    return (mycursor.rowcount, "record inserted.")
+    for bestand in files:
+        df = pd.read_csv("/data/insert/"+bestand,sep = '\\t', comment='##', header=0)
+        df = df.loc[df['ID'] != '.']
+        df['#CHROM'] = df['#CHROM'].apply(convertChrom)
+        df['ID'] = df['ID'].apply(convertID)
+        df['AF'] = df['INFO'].apply(getMeta)
+        dataset = list(df[['POS', '#CHROM', 'ID', 'REF', 'ALT', 'AF']].itertuples(index=False, name=None))
+        
+        stmt = "INSERT INTO Position (position, Chromosome, ID_position, REF, ALT, AF) VALUES (%s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE ID_position=ID_position;"
+        mycursor.executemany(stmt, dataset)  
+        mydb.commit()
+        rowsinsert += mycursor.rowcount
+    return (str(rowsinsert), "record inserted.")
 
-def read_data(file):
+def read_data(bestand):
     datalist = []
-    with open('data/'+file) as f:
+    
+    with open('/data/querry/'+bestand) as f:
         for line in f:
-            datalist.append(tuple(line.split(',')))
+            #datalist.append(tuple
+            lijstje = (line.replace('\n','').split(','))
+            lijstje[1] = int(lijstje[1])
+            lijstje[0] = convertChrom(lijstje[0])
+            datalist.append(tuple(lijstje))
     return datalist
 
 @app.route('/getresults',methods = ['POST', 'GET'])
-def get_significant(file):
-    lijstje = read_data(file)
-    
+def get_significant():
+    bestand = request.json.get('bestand')
+    lijstje = read_data(bestand)
     mydb = mysql.connector.connect(
-      host="192.168.99.101",
+      host="db",
       port="3306",
-      user="user",
-      passwd="pass",
+      user="root",
+      passwd="root",
       database="mydb"
     )
     mycursor = mydb.cursor()
@@ -79,32 +84,22 @@ def get_significant(file):
     AF
     FROM Position
     WHERE Chromosome = %s AND Position = %s AND
-    REF = %s AND ALT = %s AND AF < 0,1
+    REF = %s AND ALT = %s
+    AND AF < 0.1
     ;"""
-    mycursor.executemany(stmt, lijstje)  
-    myresult = mycursor.fetchall()
-    
+    #mycursor.executemany(stmt, lijstje)
     payload = []
-    for result in myresult:
-       content = {'pos': result[0], 'chr': result[1], 'ref': result[2], 'alt': result[3], 'af': result[4]}
-       payload.append(content)
-       content = {}
+    for data in lijstje:
+        mycursor.execute(stmt, data)
+        myresult = mycursor.fetchall()
     
-    return jsonify(payload)
+        
+        for result in myresult:
+           content = {'pos': result[0], 'chr': result[1], 'ref': result[2], 'alt': result[3], 'af': result[4]}
+           payload.append(content)
+           content = {}
+    
+    return jsonify(payload)     
 
-@app.route('/make_db', methods=['GET', 'POST'])
-def make_db(script):
-    mydb = mysql.connector.connect(
-      host="192.168.99.101",
-      port="3306",
-      user="user",
-      passwd="pass",
-      database="mydb"
-    )
-    mycursor = mydb.cursor()
-    for line in open("FileName.sql"):
-        mycursor.execute(line)    
-    mydb.commit()
-    
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', debug=True)

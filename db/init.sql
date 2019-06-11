@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `mydb`.`Position` (
   `ID_position` INT NOT NULL,
   `REF` VARCHAR(50) NOT NULL,
   `ALT` VARCHAR(50) NOT NULL,
-  `AF` INT NOT NULL,
+  `AF` FLOAT(10,9) NOT NULL,
   PRIMARY KEY (`ID_position`))
 ENGINE = InnoDB;
 

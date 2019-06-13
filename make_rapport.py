@@ -11,13 +11,13 @@ import sys
 def readraport(bestand):
     df = pd.read_json(bestand)
     return df
-
+"maakt een tabel voor alle data op"
 def get_table(df):
     cols = ['chr', 'pos', 'ref', 'alt', 'af']
     df = df[cols]
     x = df.to_html(classes='w3-table-all', bold_rows=True)
     return str(x)
-
+"maakt de chromosoom distrubutie voor alle data op"
 def get_circle_cos(df):
     df = df['chr']
     x = df.value_counts()
@@ -26,14 +26,14 @@ def get_circle_cos(df):
         data = {'y':n, 'label':x.index[i]}
         lijstje.append(data)
     return str(lijstje)
-
+"maakt een tabel voor de top 5 laagste frequencies"
 def get_lowest(df):
     cols = ['chr', 'pos', 'ref', 'alt', 'af']
     df = df[cols]
     df = df.sort_values(by=['af'], ascending=False).head(5)
     x = df.to_html(classes='w3-table-all', bold_rows=True)
     return str(x)
-    
+"maakt een tabel voor de top 5 hoogste frequencies" 
 def get_highest(df):
     cols = ['chr', 'pos', 'ref', 'alt', 'af']
     df = df[cols]
@@ -41,6 +41,7 @@ def get_highest(df):
     x = df.to_html(classes='w3-table-all', bold_rows=True)
     return str(x)
 
+"stelt het rapport samen"
 def main(file_in, file_out):
     df = readraport(file_in)
     rapport = '<HTML><BODY><link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">'

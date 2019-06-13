@@ -10,7 +10,9 @@ from flask import Flask, jsonify, request
 from os import listdir
 
 app = Flask(__name__)
-
+"""
+converteren van de chromosomen naar integers
+"""
 def convertChrom(x):
     if x in ['y', 'Y']:
         x = 23
@@ -18,13 +20,22 @@ def convertChrom(x):
         x = 24
     return int(x)
 
+"""
+converteren van de id's naar integers
+"""
 def convertID(x):
     x = x[2:]
     return int(x)
-    
+
+"""
+Verkrijgen van de alele frequencies
+"""    
 def getMeta(x):
     return float(x.split(';')[2].split('=')[1])    
 
+"""
+het lezen van de bestanden en ze up loaden naar de database
+"""
 @app.route('/filldb', methods=['GET', 'POST'])
 def readFile():
     files = listdir("/data/insert/")
@@ -63,6 +74,9 @@ def read_data(bestand):
             datalist.append(tuple(lijstje))
     return datalist
 
+"""
+lezen van het bestand, en vervolgens de database querryen en de resultaten terug geven aan snakemake
+"""
 @app.route('/getresults',methods = ['POST', 'GET'])
 def get_significant():
     bestand = request.json.get('bestand')

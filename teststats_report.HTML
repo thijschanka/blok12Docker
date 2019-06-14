@@ -1,0 +1,137 @@
+<HTML><BODY><link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css"><script>
+window.onload = function() {
+
+var chart = new CanvasJS.Chart("chartContainer", {
+	theme: "light2", // "light1", "light2", "dark1", "dark2"
+	exportEnabled: true,
+	animationEnabled: true,
+	title: {
+		text: "Chromosome distrubution"
+	},
+	data: [{
+		type: "pie",
+		startAngle: 25,
+		toolTipContent: "<b>{label}</b>: {y}%",
+		showInLegend: "true",
+		legendText: "{label}",
+		indexLabelFontSize: 16,
+		indexLabel: "{label} - {y}%",
+		dataPoints: [{'y': 3, 'label': 23}]}]
+});
+chart.render();
+
+}
+</script>
+<div id="chartContainer" style="height: 370px; width: 100%;"></div>
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script><br>Top 5 lowest alele frequencies<br><table border="1" class="dataframe w3-table-all">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>chr</th>
+      <th>pos</th>
+      <th>ref</th>
+      <th>alt</th>
+      <th>af</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>23</td>
+      <td>2655003</td>
+      <td>C</td>
+      <td>G</td>
+      <td>0.000015</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>23</td>
+      <td>15591526</td>
+      <td>G</td>
+      <td>A</td>
+      <td>0.000017</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>23</td>
+      <td>2654979</td>
+      <td>G</td>
+      <td>C</td>
+      <td>0.000030</td>
+    </tr>
+  </tbody>
+</table><br>Top 5 highest alele frequencies<br><table border="1" class="dataframe w3-table-all">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>chr</th>
+      <th>pos</th>
+      <th>ref</th>
+      <th>alt</th>
+      <th>af</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>23</td>
+      <td>2654979</td>
+      <td>G</td>
+      <td>C</td>
+      <td>0.000030</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>23</td>
+      <td>15591526</td>
+      <td>G</td>
+      <td>A</td>
+      <td>0.000017</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>23</td>
+      <td>2655003</td>
+      <td>C</td>
+      <td>G</td>
+      <td>0.000015</td>
+    </tr>
+  </tbody>
+</table><br>all potential pathogenic mutations<br><table border="1" class="dataframe w3-table-all">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>chr</th>
+      <th>pos</th>
+      <th>ref</th>
+      <th>alt</th>
+      <th>af</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>23</td>
+      <td>2654979</td>
+      <td>G</td>
+      <td>C</td>
+      <td>0.000030</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>23</td>
+      <td>2655003</td>
+      <td>C</td>
+      <td>G</td>
+      <td>0.000015</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>23</td>
+      <td>15591526</td>
+      <td>G</td>
+      <td>A</td>
+      <td>0.000017</td>
+    </tr>
+  </tbody>
+</table><br></BODY></HTML>
